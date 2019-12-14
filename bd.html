@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Autoreg</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="libs/noty/lib/themes/relax.css">
+  <link rel="stylesheet" href="libs/noty/lib/noty.css">
+  <link rel="stylesheet" href="fonts/stylesheet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrapper">
+    <div class="wrapper-top">
+      <header>
+        <div class="logo">
+          AUT <span>O</span> REG
+        </div>
+        <nav class="nav">
+          <ul>
+            <li><a href="index.html">Проверка</a></li>
+            <span>|</span>
+            <li><a href="bd.html" class="bordered">База данных</a></li>
+          </ul>
+        </nav>
+      </header>
+      <section class="main main-bd">
+        <div class="content">
+          <div class="content-buttons">
+            <button class="btn add-btn">+ Добавить авто</button>
+          </div>  
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="column-check">
+                </th>
+                <th class="column-number">Номер</th>
+                <th class="column-avto">Авто</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <i class="material-icons delete-auto">delete_forever</i>
+                </td>
+                <td>
+                  m939329
+                </td>
+                <td>
+                  lifan smiley
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <i class="material-icons delete-auto">delete_forever</i>
+                </td>
+                <td>
+                  m939329
+                </td>
+                <td>
+                  lifan smiley
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <i class="material-icons delete-auto">delete_forever</i>
+                </td>
+                <td>
+                  m939329
+                </td>
+                <td>
+                  lifan smiley
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    <footer>
+      <p class="copyright">Copyright © 2019</p>
+    </footer>
+  </div>
+  <div class="form-area" style="display: none;">
+    <div class="form">
+      <span class="crest"></span></span>
+      <span class="form-title">Добавление авто</span>
+      <div class="form-input-block">
+        <p>Номер</p>
+        <input type="text" class="form-number">
+      </div>
+      <div class="form-input-block">
+        <p>Марка</p>
+        <input type="text" class="form-name">
+      </div>
+      <button class="form-button">Добавить</button>
+    </div>
+  </div>
+  <div id="notes">
+    <div class="note-item" data-type="info" role="alert">
+      <div class="note-item-text">Announcement</div>
+      <button class="note-item-btn" role="button" aria-label="Скрыть"></button>
+    </div>
+  </div>
+  <script src="libs/jquery.min.js"></script>
+  <script src="libs/noty/lib/noty.min.js"></script>
+  <script src="js/bd.js"></script>
+</body>
+</html>
