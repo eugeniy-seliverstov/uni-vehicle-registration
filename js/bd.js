@@ -1,4 +1,5 @@
 let globalNumber = 1;
+let url = "";
 
 const viewError = error => {
   console.error(error);
@@ -6,7 +7,7 @@ const viewError = error => {
 
 /* Удалить автомобиль из базы данных */
 const deleteAuto = async (number) => {
-  const url = "http://haha";
+  const url = `${url}/`;
   const settings = {
     method: "POST",
     headers: {
@@ -50,7 +51,7 @@ const deleteAutoResp = respond => {
 
 /* Добавить автомобиль в базу данных */
 const addAuto = async (number,name) => {
-  const url = "http://haha";
+  const url = `${url}/`;
   const settings = {
     method: "POST",
     headers: {
@@ -95,7 +96,7 @@ const addAutoResp = respond => {
 
 /* Получить список всех автомобилей */
 const getListAuto = async (number) => {
-  const url = "http://haha/?offset";
+  const url = `${url}/`;
   globalNumber = number;
   try {
     const response = await fetch(url+"/?offset="+number);
