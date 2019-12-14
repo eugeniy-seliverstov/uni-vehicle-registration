@@ -1,25 +1,22 @@
 let globalNumber = 1;
-let url = "";
+let url = "http://127.0.0.1:3012";
 
 const viewError = error => {
   console.error(error);
 }
 
 /* Удалить автомобиль из базы данных */
-const deleteAuto = async (number) => {
-  const url = `${url}/`;
+const deleteAuto = async (id) => {
+  const url1 = `${url}/cars/remove/${id}`;
   const settings = {
     method: "POST",
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      number
-    }),
+    }
   }
   try {
-    const response = await fetch(url,settings);
+    const response = await fetch(url1,settings);
     if (response.ok) {
       return await response.json();
     } else {
@@ -51,7 +48,7 @@ const deleteAutoResp = respond => {
 
 /* Добавить автомобиль в базу данных */
 const addAuto = async (number,name) => {
-  const url = `${url}/`;
+  const url1 = `${url}/cars/add`;
   const settings = {
     method: "POST",
     headers: {
@@ -64,7 +61,7 @@ const addAuto = async (number,name) => {
     }),
   }
   try {
-    const response = await fetch(url,settings);
+    const response = await fetch(url1,settings);
     if (response.ok) {
       return await response.json();
     } else {
@@ -96,10 +93,10 @@ const addAutoResp = respond => {
 
 /* Получить список всех автомобилей */
 const getListAuto = async (number) => {
-  const url = `${url}/`;
+  const url1 = `${url}/cars?offset=${number}`;
   globalNumber = number;
   try {
-    const response = await fetch(url+"/?offset="+number);
+    const response = await fetch(url1);
     if (response.ok) {
       return await response.json();
     } else {
@@ -123,9 +120,10 @@ const fillTable = array => {
   const checkbox ='<i class="material-icons delete-auto">delete_forever</i>';
   table.innerHTML = "";
   for (let i of array) {
-    let str = "<tr>" + checkbox;
-    str += `<td>${i[0]}</td>`;
-    str += `<td>${i[1]}</td>`;
+    let str = "<tr>";
+    str += `<td>${checkbox}</td>`;
+    str += `<td>${i['number']}</td>`;
+    str += `<td>${i['name']}</td>`;
     str += "</tr>";
     table.innerHTML += str;
   }

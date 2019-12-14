@@ -4,7 +4,7 @@ const viewError = error => {
 
 /* Обработка отправки картинки на сервер */
 const sendPicture = async () => {
-  const url = "http://haha";
+  const url = "http://127.0.0.1:3012/check";
   const settings = {
     method: "POST",
     headers: {
@@ -18,6 +18,7 @@ const sendPicture = async () => {
     document.querySelector('#img').style.display = 'none';
     document.querySelector('.auto').style.opacity = '0';
 
+    
     const response = await fetch(url,settings);
 
     if (response.ok) {
