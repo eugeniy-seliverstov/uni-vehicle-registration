@@ -1,5 +1,5 @@
-let globalNumber = 1;
-let url = "http://127.0.0.1:3012";
+let glNumber = localStorage.getItem('number') ? localStorage.getItem('number') : 0;
+let glUrl = "http://127.0.0.1:3012";
 
 const viewError = error => {
   console.error(error);
@@ -7,7 +7,7 @@ const viewError = error => {
 
 /* Удалить автомобиль из базы данных */
 const deleteAuto = async (id) => {
-  const url1 = `${url}/cars/remove/${id}`;
+  const url = `${glUrl}/cars/remove/${id}`;
   const settings = {
     method: "POST",
     headers: {
@@ -16,7 +16,7 @@ const deleteAuto = async (id) => {
     }
   }
   try {
-    const response = await fetch(url1,settings);
+    const response = await fetch(url,settings);
     if (response.ok) {
       return await response.json();
     } else {
@@ -27,7 +27,7 @@ const deleteAuto = async (id) => {
   }
 }
 const deleteAutoResp = respond => {
-  if (respond) {
+  if (respond['status']) {
     new Noty({
       type: 'success',
       theme: 'relax',
@@ -35,6 +35,8 @@ const deleteAutoResp = respond => {
       text: 'Автомобиль успешно удален',
       timeout: 1000,
     }).show();
+
+    getListAuto(glNumber).then(fillTable).catch(viewError)
   } else {
     new Noty({
       type: 'error',
@@ -48,7 +50,7 @@ const deleteAutoResp = respond => {
 
 /* Добавить автомобиль в базу данных */
 const addAuto = async (number,name) => {
-  const url1 = `${url}/cars/add`;
+  const url = `${glUrl}/cars/add`;
   const settings = {
     method: "POST",
     headers: {
@@ -61,7 +63,7 @@ const addAuto = async (number,name) => {
     }),
   }
   try {
-    const response = await fetch(url1,settings);
+    const response = await fetch(url,settings);
     if (response.ok) {
       return await response.json();
     } else {
@@ -72,7 +74,7 @@ const addAuto = async (number,name) => {
   }
 }
 const addAutoResp = respond => {
-  if (respond) {
+  if (respond['status']) {
     new Noty({
       type: 'success',
       theme: 'relax',
@@ -80,6 +82,8 @@ const addAutoResp = respond => {
       text: 'Автомобиль успешно добавлен',
       timeout: 1000,
     }).show();
+    
+    getListAuto(glNumber).then(fillTable).catch(viewError)
   } else {
     new Noty({
       type: 'error',
@@ -91,12 +95,80 @@ const addAutoResp = respond => {
   }
 }
 
+/* Получение кол-ва страниц */
+const getPages = async () => {
+  const url = `${glUrl}/pages`;
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      return await response.json();
+    } else {
+      console.error("Ошибка HTTP: " + response.status);
+    }
+  } catch (e) {
+    console.log("Ошибка получения списка страниц!");
+  }
+}
+const addPagesOnSite = (pages) => {
+  let currentPage = glNumber + 1;
+  const pagination = document.querySelector(".pagination");
+  pagination.innerHTML = "";
+  if (pages !== undefined) {
+    if (pages <= 6) {
+      for(let i = 1; i <= 6; i++) {
+        if (i != currentPage)
+          pagination.innerHTML += `<span class="pagination-link" data-id="${i-1}">${i}</span>\n`;
+        else 
+          pagination.innerHTML += `<span class="pagination-link main-link" data-id="${i-1}">${i}</span>\n`;
+      }
+    } else {
+      if (currentPage < 4) {
+        for(let i = 1; i <= 3; i++) {
+          if (i != currentPage)
+            pagination.innerHTML += `<span class="pagination-link" data-id="${i-1}">${i}</span>\n`;
+          else 
+            pagination.innerHTML += `<span class="pagination-link main-link" data-id="${i-1}">${i}</span>\n`;
+        }
+        if (currentPage == 3) {
+          pagination.innerHTML += `<span class="pagination-link main-link" data-id="${3}">${4}</span>\n`;
+        }
+        pagination.innerHTML += `<span class="dots">...</span>\n`;
+        pagination.innerHTML += `<span class="pagination-link" data-id="${pages-1}">${pages}</span>\n`;
+      } else if (currentPage > pages - 3) {
+        pagination.innerHTML += `<span class="pagination-link" data-id="${0}">${1}</span>\n`;
+        pagination.innerHTML += `<span class="dots">...</span>\n`;
+        if (pages-2 == currentPage) {
+          pagination.innerHTML += `<span class="pagination-link" data-id="${currentPage-2}">${currentPage-1}</span>\n`;
+        }
+        for(let i = pages-2; i <= pages; i++) {
+          if (i != currentPage)
+            pagination.innerHTML += `<span class="pagination-link" data-id="${i-1}">${i}</span>\n`;
+          else 
+            pagination.innerHTML += `<span class="pagination-link main-link" data-id="${i-1}">${i}</span>\n`;
+        }
+      } else {
+        pagination.innerHTML += `<span class="pagination-link" data-id="${0}">${1}</span>\n`;
+        pagination.innerHTML += `<span class="dots">...</span>\n`;
+        for(let i = currentPage-1; i <= currentPage+1; i++) {
+          if (i != currentPage)
+            pagination.innerHTML += `<span class="pagination-link" data-id="${i-1}">${i}</span>\n`;
+          else 
+            pagination.innerHTML += `<span class="pagination-link main-link" data-id="${i-1}">${i}</span>\n`;
+        }
+        pagination.innerHTML += `<span class="dots">...</span>\n`;
+        pagination.innerHTML += `<span class="pagination-link" data-id="${pages-1}">${pages}</span>\n`;
+      }
+    }
+  }
+}
+
 /* Получить список всех автомобилей */
 const getListAuto = async (number) => {
-  const url1 = `${url}/cars?offset=${number}`;
-  globalNumber = number;
+  const url = `${glUrl}/cars?offset=${number}`;
+  glNumber = number;
+  localStorage.setItem('number',glNumber);
   try {
-    const response = await fetch(url1);
+    const response = await fetch(url);
     if (response.ok) {
       return await response.json();
     } else {
@@ -113,7 +185,6 @@ const getListAuto = async (number) => {
     console.log("Ошибка получения списка автомобилей от сервера");
   }
 }
-
 /* Заполнение таблицы */
 const fillTable = array => {
   const table = document.querySelector('.table tbody');
@@ -121,7 +192,7 @@ const fillTable = array => {
   table.innerHTML = "";
   for (let i of array) {
     let str = "<tr>";
-    str += `<td>${checkbox}</td>`;
+    str += `<td data-id="${i['_id']}">${checkbox}</td>`;
     str += `<td>${i['number']}</td>`;
     str += `<td>${i['name']}</td>`;
     str += "</tr>";
@@ -129,7 +200,8 @@ const fillTable = array => {
   }
 }
 
-
+//getPages().then(addPagesOnSite).catch(viewError);
+//getListAuto(glNumber).then(fillTable).catch(viewError);
 
 
 /* Обработка нажатия кнопки "Добавить авто" */
@@ -149,7 +221,7 @@ document.querySelector('.table').addEventListener('click',function(e) {
   const target = e.target;
   
   if (target.classList.contains('delete-auto')) {
-    const number = target.parentNode.parentNode.querySelector('td:nth-child(2)').innerHTML.replace(/\s/g,"").toUpperCase();
+    const number = target.parentNode.getAttribute('data-id');
     deleteAuto(number).then(deleteAutoResp).catch(viewError);
   }
 });
@@ -198,3 +270,15 @@ const checkName = value => {
     return false;
   }
 }
+
+/* Переход по страницам таблицы */
+document.querySelectorAll('.pagination-link').forEach(val => {
+  val.addEventListener('click',function(e) {
+    const page = this.getAttribute("data-id");
+    glNumber = page;
+    localStorage.setItem('numer',glNumber);
+
+    getPages().then(addPagesOnSite).catch(viewError);
+    getListAuto(glNumber).then(fillTable).catch(viewError);
+  });
+});
