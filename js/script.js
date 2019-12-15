@@ -36,22 +36,23 @@ const sendPicture = async () => {
     console.log("Ошибка отправки картинки на сервер");
   }
 };
-const sendPictureResp = respond => {
+
+const sendPictureResp = async respond => {
+  if (!respond) return;
   let {status, found, car, result} = respond;
-  loadImgToBox(document.querySelector('input[name="image"]'));
+  await loadImgToBox(document.querySelector('input[name="image"]'));
 
   if (status) {
     if (found) {
       success(car.number, car.name);
-      drawFrame(result.points, true);
+      drawFrame(result.points[0], true);
     } else {
       fail(result.text);
-      drawFrame(result.points, false);
+      drawFrame(result.points[0], false);
     }
   } else {
     unknown();
   }
-  // {"status":true,"found":true,"car":{"_id":"5df533a74972290a2445c6b0","number":"A002AA177","name":"kerch"},"result":{"points":[[[396.0000000000002,364.34394904458617],[558.9826514915259,365.38205510504173],[560.0991304851237,402.2258618937677],[395.9999999999997,398.36470588235284]]],"text":["A002AA177"]}}
 };
 
 /* Form */
@@ -66,22 +67,25 @@ document.querySelector("input[type='file']").addEventListener('change', function
 
 /* Помещение картинки в бокс */
 const loadImgToBox = (input) => {
-  const picture = document.querySelector("#img");
-  let reader = new FileReader();
-
-  reader.onload = e => {
-    picture.src = e.target.result;
-
-    let img = document.createElement('img');
-    img.onload = function() {
-      scaleHeight = this.height / heightBox;
-      scaleWight = this.width / widthBox;
-    };
-    img.src = e.target.result;
-  }
-
-  reader.readAsDataURL(input.files[0]);
-  picture.style.display = "inline-block";
+  return new Promise((resolve, reject) => {
+    const picture = document.querySelector("#img");
+    let reader = new FileReader();
+  
+    reader.onload = e => {
+      picture.src = e.target.result;
+  
+      let img = document.createElement('img');
+      img.onload = function() {
+        scaleHeight = this.height / heightBox;
+        scaleWidth = this.width / widthBox;
+        resolve();
+      };
+      img.src = e.target.result;
+    }
+  
+    reader.readAsDataURL(input.files[0]);
+    picture.style.display = "inline-block";
+  });
 }
 
 /* Возможные ответы от сервера */
@@ -148,7 +152,7 @@ const drawFrame = (points, type) => {
   let canvas = document.getElementById("canvas"),
       ctx = canvas.getContext("2d"),
       strokeStyle = type ? "#56b651" : "#b04949";
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   ctx.strokeStyle = strokeStyle;
   ctx.beginPath();
   ctx.moveTo(x1,y1);

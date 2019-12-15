@@ -5,6 +5,7 @@ const viewError = error => {
   console.error(error);
 }
 
+
 /* Удалить автомобиль из базы данных */
 const deleteAuto = async (id) => {
   const url = `${glUrl}/cars/remove/${id}`;
@@ -36,6 +37,7 @@ const deleteAutoResp = respond => {
       timeout: 1000,
     }).show();
 
+    getPages().then(addPagesOnSite).catch(viewError);
     getListAuto(glNumber).then(fillTable).catch(viewError)
   } else {
     new Noty({
@@ -83,6 +85,7 @@ const addAutoResp = respond => {
       timeout: 1000,
     }).show();
     
+    getPages().then(addPagesOnSite).catch(viewError);
     getListAuto(glNumber).then(fillTable).catch(viewError)
   } else {
     new Noty({
@@ -109,13 +112,14 @@ const getPages = async () => {
     console.log("Ошибка получения списка страниц!");
   }
 }
-const addPagesOnSite = (pages) => {
-  let currentPage = glNumber + 1;
+const addPagesOnSite = ({pages}) => {
+  let currentPage = +glNumber + 1;
+  console.log(currentPage);
   const pagination = document.querySelector(".pagination");
   pagination.innerHTML = "";
   if (pages !== undefined) {
     if (pages <= 6) {
-      for(let i = 1; i <= 6; i++) {
+      for(let i = 1; i <= pages; i++) {
         if (i != currentPage)
           pagination.innerHTML += `<span class="pagination-link" data-id="${i-1}">${i}</span>\n`;
         else 
@@ -130,7 +134,7 @@ const addPagesOnSite = (pages) => {
             pagination.innerHTML += `<span class="pagination-link main-link" data-id="${i-1}">${i}</span>\n`;
         }
         if (currentPage == 3) {
-          pagination.innerHTML += `<span class="pagination-link main-link" data-id="${3}">${4}</span>\n`;
+          pagination.innerHTML += `<span class="pagination-link" data-id="${3}">${4}</span>\n`;
         }
         pagination.innerHTML += `<span class="dots">...</span>\n`;
         pagination.innerHTML += `<span class="pagination-link" data-id="${pages-1}">${pages}</span>\n`;
@@ -200,8 +204,8 @@ const fillTable = array => {
   }
 }
 
-//getPages().then(addPagesOnSite).catch(viewError);
-//getListAuto(glNumber).then(fillTable).catch(viewError);
+getPages().then(addPagesOnSite).catch(viewError);
+getListAuto(glNumber).then(fillTable).catch(viewError);
 
 
 /* Обработка нажатия кнопки "Добавить авто" */
@@ -272,13 +276,14 @@ const checkName = value => {
 }
 
 /* Переход по страницам таблицы */
-document.querySelectorAll('.pagination-link').forEach(val => {
-  val.addEventListener('click',function(e) {
-    const page = this.getAttribute("data-id");
+document.querySelector('body').addEventListener('click',function(e) {
+  const target = e.target;
+  if (target.classList.contains('pagination-link')) {
+    const page = target.getAttribute("data-id");
     glNumber = page;
-    localStorage.setItem('numer',glNumber);
-
+    localStorage.setItem('number',glNumber);
     getPages().then(addPagesOnSite).catch(viewError);
     getListAuto(glNumber).then(fillTable).catch(viewError);
-  });
+  }
 });
+
