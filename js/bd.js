@@ -184,7 +184,7 @@ document.querySelector('.form-button').addEventListener('click',function(e) {
   }
 });
 const checkNumber = value => {
-  const r = /^[АВЕКМНОРСТУХ]\d{3}(?<!000)[АВЕКМНОРСТУХ]{2}\d{2,3}$/ui;
+  const r = /^[ABEKMHOPCTYX]\d{3}(?<!000)[ABEKMHOPCTYX]{2}\d{2,3}$/ui;
   if (value.match(r)){
     return true;
   } else {

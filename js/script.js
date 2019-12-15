@@ -7,10 +7,6 @@ const sendPicture = async () => {
   const url = "http://127.0.0.1:3012/check";
   const settings = {
     method: "POST",
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
     body: new FormData(document.getElementById('main-form')),
   }
   try {
