@@ -1,10 +1,14 @@
 let glNumber = localStorage.getItem('number') ? localStorage.getItem('number') : 0;
+let search = localStorage.getItem('search') ? localStorage.getItem('search') : "";
+document.querySelector('.search').value = search;
 let glUrl = "http://127.0.0.1:3012";
 
-const viewError = error => {
-  console.error(error);
+const viewError = response => {
+  if (response.error) {
+    
+  }
+  console.error(response);
 }
-
 
 /* Удалить автомобиль из базы данных */
 const deleteAuto = async (id) => {
@@ -27,8 +31,8 @@ const deleteAuto = async (id) => {
     console.log("Ошибка удаления автомобиля из базы данных!");
   }
 }
-const deleteAutoResp = respond => {
-  if (respond['status']) {
+const deleteAutoResp = response => {
+  if (response['status']) {
     new Noty({
       type: 'success',
       theme: 'relax',
@@ -37,7 +41,6 @@ const deleteAutoResp = respond => {
       timeout: 1000,
     }).show();
 
-    getPages().then(addPagesOnSite).catch(viewError);
     getListAuto(glNumber).then(fillTable).catch(viewError)
   } else {
     new Noty({
@@ -75,8 +78,8 @@ const addAuto = async (number,name) => {
     console.log("Ошибка добавления автомобиля в базу данных!");
   }
 }
-const addAutoResp = respond => {
-  if (respond['status']) {
+const addAutoResp = response => {
+  if (response['status']) {
     new Noty({
       type: 'success',
       theme: 'relax',
@@ -85,7 +88,6 @@ const addAutoResp = respond => {
       timeout: 1000,
     }).show();
     
-    getPages().then(addPagesOnSite).catch(viewError);
     getListAuto(glNumber).then(fillTable).catch(viewError)
   } else {
     new Noty({
@@ -98,9 +100,9 @@ const addAutoResp = respond => {
   }
 }
 
-/* Получение кол-ва страниц */
-const getPages = async () => {
-  const url = `${glUrl}/pages`;
+/* Получить список всех автомобилей */
+const getListAuto = async (offset,number) => {
+  const url = `${glUrl}/cars?offset=${offset}&number=${number}`;
   try {
     const response = await fetch(url);
     if (response.ok) {
@@ -109,12 +111,33 @@ const getPages = async () => {
       console.error("Ошибка HTTP: " + response.status);
     }
   } catch (e) {
-    console.log("Ошибка получения списка страниц!");
+    new Noty({
+      type: 'error',
+      theme: 'relax',
+      layout: 'topRight',
+      text: 'Ошибка получения списка автомобилей от сервера',
+      timeout: 1000,
+    }).show();
+    console.log("Ошибка получения списка автомобилей от сервера");
   }
 }
-const addPagesOnSite = ({pages}) => {
-  let currentPage = +glNumber + 1;
-  console.log(currentPage);
+/* Заполнение таблицы */
+const fillTable = response => {
+  const { pages, cars } = response;
+
+  const table = document.querySelector('.table tbody');
+  const checkbox ='<i class="material-icons delete-auto">delete_forever</i>';
+  table.innerHTML = "";
+  for (let i of cars) {
+    let str = "<tr>";
+    str += `<td data-id="${i['_id']}">${checkbox}</td>`;
+    str += `<td>${i['number']}</td>`;
+    str += `<td>${i['name']}</td>`;
+    str += "</tr>";
+    table.innerHTML += str;
+  }
+
+  let currentPage = glNumber;
   const pagination = document.querySelector(".pagination");
   pagination.innerHTML = "";
   if (pages !== undefined) {
@@ -166,46 +189,7 @@ const addPagesOnSite = ({pages}) => {
   }
 }
 
-/* Получить список всех автомобилей */
-const getListAuto = async (number) => {
-  const url = `${glUrl}/cars?offset=${number}`;
-  glNumber = number;
-  localStorage.setItem('number',glNumber);
-  try {
-    const response = await fetch(url);
-    if (response.ok) {
-      return await response.json();
-    } else {
-      console.error("Ошибка HTTP: " + response.status);
-    }
-  } catch (e) {
-    new Noty({
-      type: 'error',
-      theme: 'relax',
-      layout: 'topRight',
-      text: 'Ошибка получения списка автомобилей от сервера',
-      timeout: 1000,
-    }).show();
-    console.log("Ошибка получения списка автомобилей от сервера");
-  }
-}
-/* Заполнение таблицы */
-const fillTable = array => {
-  const table = document.querySelector('.table tbody');
-  const checkbox ='<i class="material-icons delete-auto">delete_forever</i>';
-  table.innerHTML = "";
-  for (let i of array) {
-    let str = "<tr>";
-    str += `<td data-id="${i['_id']}">${checkbox}</td>`;
-    str += `<td>${i['number']}</td>`;
-    str += `<td>${i['name']}</td>`;
-    str += "</tr>";
-    table.innerHTML += str;
-  }
-}
-
-getPages().then(addPagesOnSite).catch(viewError);
-getListAuto(glNumber).then(fillTable).catch(viewError);
+//getListAuto(glNumber, search).then(fillTable).catch(viewError);
 
 
 /* Обработка нажатия кнопки "Добавить авто" */
@@ -281,9 +265,19 @@ document.querySelector('body').addEventListener('click',function(e) {
   if (target.classList.contains('pagination-link')) {
     const page = target.getAttribute("data-id");
     glNumber = page;
-    localStorage.setItem('number',glNumber);
-    getPages().then(addPagesOnSite).catch(viewError);
-    getListAuto(glNumber).then(fillTable).catch(viewError);
+    localStorage.setItem('number', glNumber);
+    getListAuto(glNumber, search).then(fillTable).catch(viewError);
   }
 });
-
+/* Обработка поиска */
+document.querySelector('.input-btn').addEventListener('click',function(e) {
+  const number = document.querySelector('.search').value;
+  if (number != search) {
+    alert(1);
+    search = number;
+    glNumber = 0;
+    localStorage.setItem('search',number);
+    localStorage.setItem('number',glNumber);
+    getListAuto(glNumber, search).then(fillTable).catch(viewError);
+  }
+});
